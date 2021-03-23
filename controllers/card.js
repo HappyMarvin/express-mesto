@@ -22,3 +22,23 @@ module.exports.deleteCard = (req, res) => {
     .then(result => res.send(result))
     .catch(err => res.status(500).send({ message: err.message }));
 };
+
+module.exports.addLike = (req, res) => {
+  const cardId = req.params.cardId;
+
+  Card.findByIdAndUpdate(cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },)
+    .then(card => res.send(card))
+    .catch(err => res.status(500).send({ message: err.message }));
+};
+
+module.exports.removeLike = (req, res) => {
+  const cardId = req.params.cardId;
+
+  Card.findByIdAndUpdate(cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },)
+    .then(card => res.send(card))
+    .catch(err => res.status(500).send({ message: err.message }));
+};
