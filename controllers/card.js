@@ -32,7 +32,13 @@ module.exports.deleteCard = (req, res) => {
         res.send(result);
       }
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Неверный идентификатор карточки' });
+      } else {
+        res.status(500).send({ message: err.message });
+      }
+    });
 };
 
 module.exports.addLike = (req, res) => {
@@ -49,8 +55,8 @@ module.exports.addLike = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Неверный идентификатор карточки' });
       } else {
         res.status(500).send({ message: err.message });
       }
@@ -71,9 +77,7 @@ module.exports.removeLike = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные' });
-      } else if (err.name === 'CastError') {
+       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Неверный идентификатор карточки' });
       } else {
         res.status(500).send({ message: err.message });

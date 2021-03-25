@@ -45,8 +45,7 @@ module.exports.updateProfile = (req, res) => {
     { name, about },
     {
       new: true,
-      runValidators: true,
-      upsert: false,
+      runValidators: true
     },
   )
     .then((user) => {
@@ -57,7 +56,9 @@ module.exports.updateProfile = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Неверный идентификатор пользователя' });
+      } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: err.message });
@@ -73,7 +74,6 @@ module.exports.updateAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: false,
     },
   )
     .then((user) => {
@@ -84,7 +84,9 @@ module.exports.updateAvatar = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Неверный идентификатор пользователя' });
+      } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(500).send({ message: err.message });
