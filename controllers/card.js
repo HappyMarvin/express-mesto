@@ -12,14 +12,26 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner: userId })
     .then(card => res.send(card))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .catch(err => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({message: "Переданы некорректные данные"})
+      }else {
+        res.status(500).send({message: err.message})
+      }
+    });
 };
 
 module.exports.deleteCard = (req, res) => {
   const cardId = req.params.cardId;
 
   Card.deleteOne({ _id: cardId })
-    .then(result => res.send(result))
+    .then(result => {
+      if(!result.deletedCount) {
+        res.status(404).send({message: "Карточка с указанным _id не найдена."})
+      }else {
+        res.send(result)
+      }
+    })
     .catch(err => res.status(500).send({ message: err.message }));
 };
 
@@ -29,8 +41,17 @@ module.exports.addLike = (req, res) => {
   Card.findByIdAndUpdate(cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },)
-    .then(card => res.send(card))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .then(card => {
+      if (!card) return res.status(404).send({ message: "Карточка с указанным _id не найдена." } )
+      res.send(card)
+    })
+    .catch(err => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({message: "Переданы некорректные данные"})
+      }else {
+        res.status(500).send({message: err.message})
+      }
+    });
 };
 
 module.exports.removeLike = (req, res) => {
@@ -39,6 +60,18 @@ module.exports.removeLike = (req, res) => {
   Card.findByIdAndUpdate(cardId,
     { $pull: { likes: req.user._id } },
     { new: true },)
-    .then(card => res.send(card))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .then(card => {
+      if (!card) return res.status(404).send({ message: "Карточка с указанным _id не найдена." } )
+      res.send(card)
+    })
+    .catch(err => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({message: "Переданы некорректные данные"})
+      }else if (err.name === "CastError") {
+        res.status(400).send({ message: "Неверный идентификатор карточки" })
+      }
+      else {
+        res.status(500).send({message: err.message})
+      }
+    });
 };

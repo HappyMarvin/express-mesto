@@ -27,9 +27,8 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then(user => res.send({ data: user }))
     .catch(err => {
-      console.log(err.name);
       if (err.name === "ValidationError") {
-        res.status(400).send({message: "Переданы невалидные данные"})
+        res.status(400).send({message: "Переданы некорректные данные"})
       }else {
         res.status(500).send({message: err.message})
       }
@@ -45,11 +44,20 @@ module.exports.updateProfile = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true
+      upsert: false
     }
   )
-    .then(users => res.send(users))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .then(user => {
+      if (!user) return res.status(404).send({ message: "Пользователь не найден" } )
+      res.send(user)
+    })
+    .catch(err => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({message: "Переданы некорректные данные"})
+      }else {
+        res.status(500).send({message: err.message})
+      }
+    });
 }
 
 module.exports.updateAvatar = (req, res) => {
@@ -60,9 +68,18 @@ module.exports.updateAvatar = (req, res) => {
     {
       new: true,
       runValidators: true,
-      upsert: true
+      upsert: false
     }
   )
-    .then(users => res.send(users))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .then(user => {
+      if (!user) return res.status(404).send({ message: "Пользователь не найден" } )
+      res.send(user)
+    })
+    .catch(err => {
+      if (err.name === "ValidationError") {
+        res.status(400).send({message: "Переданы некорректные данные"})
+      }else {
+        res.status(500).send({message: err.message})
+      }
+    });
 }
