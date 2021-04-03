@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const BadRequestError = require('../errors/bad-request-error');
+const NotFoundError = require('../errors/not-found-error');
+const ConflictError = require('../errors/conflict-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -14,7 +16,7 @@ module.exports.getUserById = (req, res, next) => {
   User.findOne({ _id: userId })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        next(new NotFoundError('Пользователь не найден'));
       } else {
         res.send(user);
       }
@@ -23,7 +25,7 @@ module.exports.getUserById = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Неверный идентификатор пользователя'));
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
@@ -42,9 +44,9 @@ module.exports.createUser = (req, res, next) => {
           if (err.name === 'ValidationError') {
             next(new BadRequestError('Переданы некорректные данные'));
           } else if (err.code === 11000) {
-            res.status(409).send({ message: 'Пользователь с таким email уже существует' });
+            next(new ConflictError('Пользователь с таким email уже существует'));
           } else {
-            res.status(500).send({ message: err.message });
+            next(err);
           }
         });
     });
@@ -62,7 +64,7 @@ module.exports.updateProfile = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        next(new NotFoundError('Пользователь не найден'));
       } else {
         res.send(user);
       }
@@ -73,7 +75,7 @@ module.exports.updateProfile = (req, res, next) => {
       } else if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
@@ -90,7 +92,7 @@ module.exports.updateAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        next(new NotFoundError('Пользователь не найден'));
       } else {
         res.send(user);
       }
@@ -101,7 +103,7 @@ module.exports.updateAvatar = (req, res, next) => {
       } else if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
       } else {
-        res.status(500).send({ message: err.message });
+        next(err);
       }
     });
 };
