@@ -11,6 +11,18 @@ module.exports.getUsers = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getUser = (req, res, next) => {
+  User.findOne({ _id: req.user._id })
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('Пользователь не найден'));
+      } else {
+        res.send(user);
+      }
+    })
+    .catch(next);
+};
+
 module.exports.getUserById = (req, res, next) => {
   const userId = req.params.id;
   User.findOne({ _id: userId })
