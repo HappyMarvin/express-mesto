@@ -18,7 +18,7 @@ const validateSignUpBody = celebrate({
   }),
 });
 
-const validateUserId = celebrate({
+const validateId = celebrate({
   params: Joi.object().keys({
     id: Joi.required().custom(((value, helpers) => {
       if (ObjectId.isValid(value)) {
@@ -32,8 +32,40 @@ const validateUserId = celebrate({
   }).unknown(),
 });
 
+const validateUserProfile = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+  headers: Joi.object().keys({
+    authorization: Joi.string().required(),
+  }).unknown(),
+});
+
+const validateUserAvatar = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().pattern(/^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*\s*$/, 'URL'),
+  }),
+  headers: Joi.object().keys({
+    authorization: Joi.string().required(),
+  }).unknown(),
+});
+
+const validateCardBody = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(/^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*\s*$/, 'URL'),
+  }),
+  headers: Joi.object().keys({
+    authorization: Joi.string().required(),
+  }).unknown(),
+});
+
 module.exports = {
   validateSignUpBody,
   validateSignInBody,
-  validateUserId,
+  validateId,
+  validateUserProfile,
+  validateUserAvatar,
+  validateCardBody,
 };
