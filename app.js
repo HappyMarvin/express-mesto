@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/error-handler');
 const auth = require('./middlewares/auth');
-const { createUser, login } = require('./controllers/user');
+const { createUser, login } = require('./controllers/users');
 const { validateSignUpBody, validateSignInBody } = require('./middlewares/validatons');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
