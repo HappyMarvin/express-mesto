@@ -12,7 +12,7 @@ const validateSignUpBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*\s*$/, 'URL'),
+    avatar: Joi.string().uri(),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -34,8 +34,8 @@ const validateId = celebrate({
 
 const validateUserProfile = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
   headers: Joi.object().keys({
     authorization: Joi.string().required(),
@@ -44,7 +44,7 @@ const validateUserProfile = celebrate({
 
 const validateUserAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(/^(https?:\/\/)?([\w-]{1,32}\.[\w-]{1,32})[^\s@]*\s*$/, 'URL'),
+    avatar: Joi.string().required().uri(),
   }),
   headers: Joi.object().keys({
     authorization: Joi.string().required(),
