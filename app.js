@@ -8,6 +8,7 @@ const auth = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
 const { validateSignUpBody, validateSignInBody } = require('./middlewares/validatons');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const NotFoundError = require('./errors/not-found-error');
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -39,8 +40,8 @@ app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use('/', (req, res) => {
-  res.status(404).send({ message: 'Неверный адрес запроса' });
+app.use('/', (req, res, next) => {
+  next(new NotFoundError('Неверный адрес запроса'));
 });
 
 app.use(errorLogger);
