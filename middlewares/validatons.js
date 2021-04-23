@@ -1,5 +1,6 @@
 const { celebrate, Joi } = require('celebrate');
 const { ObjectId } = require('mongoose').Types;
+const validator = require('validator');
 
 const validateSignInBody = celebrate({
   body: Joi.object().keys({
@@ -12,7 +13,12 @@ const validateSignUpBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().uri(),
+    avatar: Joi.string().custom((value, helper) => {
+      if (!validator.isURL(value, { require_protocol: true })) {
+        return helper.message('Передана невалидная ссылка');
+      }
+      return value;
+    }),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
@@ -44,7 +50,12 @@ const validateUserProfile = celebrate({
 
 const validateUserAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().uri(),
+    avatar: Joi.string().required().custom((value, helper) => {
+      if (!validator.isURL(value, { require_protocol: true })) {
+        return helper.message('Передана невалидная ссылка');
+      }
+      return value;
+    }),
   }),
   headers: Joi.object().keys({
     authorization: Joi.string().required(),
@@ -54,7 +65,12 @@ const validateUserAvatar = celebrate({
 const validateCardBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().uri(),
+    link: Joi.string().required().custom((value, helper) => {
+      if (!validator.isURL(value, { require_protocol: true })) {
+        return helper.message('Передана невалидная ссылка');
+      }
+      return value;
+    }),
   }),
   headers: Joi.object().keys({
     authorization: Joi.string().required(),
